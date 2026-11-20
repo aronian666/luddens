@@ -90,7 +90,7 @@ Solid rules (chemistry) allow building. From the organelle level upward the rule
 
 ### 2.6 Campaign progression
 
-- The campaign starts in the Atom workshop. Each workshop is unlocked by completing the required missions and final challenge in the previous one. Later Explore levels can use experiments with observable goals as their required missions.
+- The campaign starts in the Atom workshop. Each workshop defines its unlock condition. Atom uses a ladder of timed order rounds and requires one star per level to advance. Later Explore levels can use experiments with observable goals as their required missions.
 - Every mission provides a starting state, an observable goal, and the pieces or controls needed to reach it. The simulator checks the result. Any sequence of permitted actions can satisfy a construction goal.
 - The player can undo each move, reset the mission, and request hints. Attempts and hints carry no progression penalty. Completed missions and workshop unlocks are saved so the player can resume the campaign.
 - Unlocked workshops can be revisited. Optional missions offer more experiments and can be completed after advancing.
@@ -197,10 +197,10 @@ After an edit, the player can undo the last action or reset to the mission's sta
 
 ## 6. Suggested Roadmap
 
-1. **Atom campaign**. Build the Orbital Workshop, read-only Electron Cloud, particle edits, missions, final challenge, and saved progress. Add the optional orbital configuration and carbon-14 missions within this workshop.
+1. **Atom**. Build the timed order ladder with saved best scores, and a separate read-only laboratory for exploring orbitals from a periodic table.
 2. **Molecule unlock**. Build the opening water mission with a Lewis board and synchronized 3D view. Verify that inspecting an atom and returning preserves the board.
 3. **Molecule workshop expansion**. Add the rest of the initial molecule catalog, polarity, and ionic examples, then define the final challenge that unlocks Macromolecule.
-4. **Orbital and crystal visualization**. Extend cloud rendering with nodes and phase. Add the ionic crystal view.
+4. **Ionic crystal visualization**. Extend the Molecule workshop with a lattice view.
 5. **Macromolecule workshop**. Define monomer challenges and its unlock condition.
 6. **Organelle and Cell**. Define experiments and progression for Explore mode.
 7. **Tissue, Organ, Organ System, and Organism**. Extend anatomy exploration and connect it to unlocked workshops.

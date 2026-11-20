@@ -15,10 +15,10 @@
 - Deployment currently uses `adapter-auto`; select a target-specific adapter if the deployment environment is unsupported.
 
 ## Product context
-- The app is a scaffold: `src/routes/+page.svelte` is empty and `src/lib/index.ts` is a placeholder. Do not mistake the design documents for implemented features.
+- Atom uses `/atom/laboratorio` for the periodic-table explorer and `/atom/pruebas` for its timed campaign. The root route opens the laboratory.
 - Before implementing workshops, read `docs/human-body-viewer-design.md` and the Atom-specific `docs/human-body-viewer-atom.md`; the README is generic scaffold documentation.
 - The design requires separate rules per scale: higher-level workshops consume a piece's interface, not its internals. The initial playable scope is the Atom campaign followed by the opening Molecule water mission.
-- Atom's editable Orbital Workshop and read-only Electron Cloud must share state; switching views preserves the build, mission, and undo history. Cross-workshop inspection must restore the originating board and selection on return.
+- The laboratory and campaign share the Atom model and renderer. Their specimen selections are independent. The Atom layout preserves an active round when navigating between the two routes. Cross-workshop inspection must restore the originating board and selection on return.
 
 ## Workshop architecture
 - Use TypeScript classes for workshop rules, reactive state, and gameplay actions. Svelte components render that state and forward user input.

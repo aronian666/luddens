@@ -1,1 +1,60 @@
 @import 'tailwindcss';
+
+@theme {
+	--color-page: #0b1217;
+	--color-panel: #121e25;
+	--color-line: #2c4149;
+	--color-mint: #a8f5ce;
+	--color-muted: #a7bac0;
+	--color-ink: #eef6f5;
+	--color-control: #1a2a31;
+	--color-selected: #203e36;
+	--color-selection: #67a98c;
+	--color-focus: #eec48c;
+	--color-warning: #f1d0a4;
+	--font-sans: 'Inter', system-ui, sans-serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+	--animate-spin-entry: spin-entry 220ms ease-out;
+	--animate-score-pop: score-pop 320ms ease-out;
+	--animate-order-ring: order-ring 520ms ease-out both;
+	--animate-point-rise: point-rise 520ms ease-out both;
+	--animate-order-shake: order-shake 320ms ease-out;
+	--animate-flame: flame 680ms ease-in-out infinite alternate;
+
+	@keyframes spin-entry {
+		from { opacity: 0; transform: translateY(4px); }
+	}
+
+	@keyframes score-pop {
+		35% { transform: scale(1.18); }
+	}
+
+	@keyframes order-ring {
+		from { opacity: .9; transform: scale(.98); }
+		to { opacity: .15; transform: scale(1); }
+	}
+
+	@keyframes point-rise {
+		from { transform: translateY(12px) scale(.8); }
+		35% { transform: translateY(2px) scale(1.13); }
+		to { transform: translateY(-2px); }
+	}
+
+	@keyframes order-shake {
+		20%, 60% { transform: translateX(-5px); }
+		40%, 80% { transform: translateX(4px); }
+	}
+
+	@keyframes flame {
+		from { transform: rotate(-5deg) scale(.93, 1.06); }
+		to { transform: rotate(6deg) scale(1.07, .91); }
+	}
+}
+
+@utility atom-control {
+	@apply min-h-11 min-w-11 cursor-pointer rounded-[.55rem] border border-line bg-control px-3 py-[.45rem] font-medium enabled:hover:border-mint disabled:cursor-default disabled:text-[#91a2a7];
+}
+
+@utility element-category {
+	@apply data-[category=metal]:[--element-color:#94caff] data-[category=metalloid]:[--element-color:#ffd078] data-[category=nonmetal]:[--element-color:var(--color-mint)];
+}

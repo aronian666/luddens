@@ -16,7 +16,7 @@ description: Design, implement, or review Human Body Viewer workshops using Type
 ## Atom and workshop boundaries
 
 - Let the atom model own particle and orbital rules. Let the workshop session own missions, undo, reset, and progress. A rejected edit leaves the atom and history intact. Return a typed result so the UI can show feedback without interpreting the scientific rule.
-- Share one session between the Orbital Workshop and Electron Cloud. The cloud reads atom state and offers display controls. The editor invokes mutation methods. Switching views preserves the current atom, mission, and undo history.
+- Share the atom model and renderer between the read-only periodic-table laboratory and the editable campaign. Keep their selections independent. Keep the campaign session in the Atom route layout so navigation preserves the build, mission, and undo history while its timer continues.
 - Give each scale its own rules and expose a typed piece interface for the next scale. The Molecule workshop consumes the atom's bonding interface. Keep the molecule board and selection in the owning session so atom inspection can restore both on return.
 - Serialize progress and other saved state through explicit typed snapshots. Reconstruct class instances from those snapshots and inject browser persistence at the application boundary.
 

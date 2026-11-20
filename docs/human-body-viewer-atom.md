@@ -13,35 +13,47 @@ The Atom workshop is the campaign entry point. Players learn to distinguish elem
 - **Neutrons** define the **isotope**. A nucleus with an unsuitable neutron/proton ratio is unstable.
 - Electrons are placed following the real rules: at most 2 per orbital (Pauli exclusion), and one in each orbital before pairing up (Hund's rule). A third electron in 1s is rejected.
 
-## Atom views
+## Atom routes
 
-| View | What the player sees | What the player can do |
-|---|---|---|
-| **Orbital Workshop** | An editable nucleus and an electron diagram grouped by shell, subshell, and orbital slot. For example, shell 2 contains subshells 2s and 2p, and 2p has three orbital slots. | Add or remove protons, neutrons, and electrons. In configuration challenges, choose which orbital receives each electron. |
-| **Electron Cloud** | A read-only, realistic-style visualization of the same atom's occupied orbitals as probability clouds. The shapes illustrate where an electron is likely to be found. Multi-electron clouds are teaching approximations. | Rotate, zoom, and filter visible shells or subshells. These controls affect the view. Particle editing and mission actions are available in the Orbital Workshop. |
+| Route | Purpose |
+|---|---|
+| `/atom/laboratorio` | Open learning view. Select any of the 118 elements from the periodic table, read its particle counts and electron configuration, and inspect the orbitals in Three.js. |
+| `/atom/laboratorio/comparar` | Compare up to ten neutral atoms on a common scale. Group headers select the first available members by atomic number. The models share one orthographic camera, a Z-up grid with 50 pm divisions on all three coordinate planes, and synchronized electron samples. Each model is identified by its symbol and scaled to the [single-bond covalent radius](https://doi.org/10.1002/chem.200800987). |
+| `/atom/pruebas` | Normal campaign with three particle trials followed by Electron configuration. All four trials have three stars. |
+| `/atom/pruebas/[nivel]` | Full-screen timed trial, with electron configuration available after the campaign path. |
 
-Both views read the same atom state and display its element, mass number, charge, and electron configuration. Switching views preserves the build, mission, and undo history. The cloud view is available from the first Atom mission. The existing electron-count slider and Bohr diagram can serve as demo tools. The campaign uses the Orbital Workshop as its editor.
+In the configuration round, the player clicks each orbital slot or presses Enter to cycle through empty, spin up, and paired spins. Tab moves between controls in the Möller diagram. Activating a subshell fills the subshells that precede it, leaving the chosen and later slots as they are. The order shows the element’s symbol and name. A third electron in one orbital is rejected. Delivery checks the lowest-energy arrangement modeled for that challenge. The two routes use the same atom model and keep independent selections. The level route occupies the viewport. The lab and level list use bottom navigation. Returning from gameplay leaves the active round in the Atom layout with its timer running.
 
-The workshop can place electrons automatically in missions about element, isotope, and charge. In the configuration mission, the player fills orbital slots manually. A third electron in one orbital is rejected. The configuration goal checks for the lowest-energy arrangement modeled for that challenge and provides a hint for allowed arrangements that miss the goal.
+## Timed order ladder
 
-## Atom campaign
+Each order requests a complete atom or ion. Its card shows the element symbol, an upper-left mass number, and an upper-right superscript for nonzero charge. The laboratory and all orders share three element colors: blue for metals, amber for metalloids, and mint green for nonmetals. The table has a legend and each selected element or order names its category. This teaching palette uses B, Si, Ge, As, Sb and Te as metalloids. Halogens and noble gases share the nonmetal color. For the heaviest elements, the colors follow periodic position. Changing the isotope or charge preserves the element’s category. Players start with an empty workspace for every order. The first three rounds use numeric inputs and submit with the Send button or Enter. Focus returns to the proton input after each submission. In the configuration round, the nucleus is set from the order and players fill only the orbital slots. The configuration round delivers automatically once the proton, neutron, and electron totals match and the orbital configuration is correct. The completed order remains visible briefly before the next order. The orbital round also checks the ground-state configuration.
 
-| Mission | Starting state and objective | Completion condition |
-|---|---|---|
-| Change the element | Start with neutral carbon-12. Turn it into nitrogen. | The nucleus has seven protons. Charge and neutron count are unrestricted by the mission. |
-| Same element, different mass | Start with neutral oxygen-16. Make neutral oxygen-17. | Eight protons, nine neutrons, eight electrons. |
-| Exact charge | Start with neutral sodium-23. Make Na⁺ while preserving the nucleus. | Eleven protons, twelve neutrons, ten electrons. |
-| Arrange the electrons (optional) | Place seven electrons in the lowest-energy configuration for neutral nitrogen. | 1s² 2s² 2p³, with one electron in each 2p orbital. |
-| Observe decay (optional) | Build a carbon-14 nucleus, predict the daughter element, then select **Fast-forward time**. | The player correctly predicts nitrogen and observes the beta decay into nitrogen-14. |
-| Final challenge | Start with neutral oxygen-16. Deliver neutral fluorine-19. | Nine protons, ten neutrons, nine electrons. The player chooses the order of edits. |
+Opening an unlocked trial starts its timer and first order immediately. Reopening an active trial during the same visit resumes the current order. Choosing a different unlocked trial starts a fresh round there and retains every star already earned. Normal mode uses the meadow map and shows the atomic number at the lower left of every particle order.
 
-The three required missions unlock the final challenge. Players can undo an edit, reset to the mission’s starting state, and request hints. Attempts and hints carry no penalty. Completed missions and workshop unlocks are saved. Optional missions remain available after advancing. Passing it unlocks the Molecule workshop and its opening mission, **Build Water**. The player gets two hydrogen atoms and one oxygen atom, completes the Lewis structure, and sees the result in 3D. Inspecting the oxygen opens the Atom workshop in the context of that piece. Returning restores the board and selection.
+| Trial | Time | Example order |
+|---|---:|---|
+| Átomos neutros | 120 s | Neutral carbon-12 |
+| Isótopos | 135 s | Neutral carbon-13 |
+| Iones | 150 s | Carbon-12 with charge +1 |
+| Configuración electrónica | 180 s | Ground-state electron configuration of carbon |
 
-## Planned Electron Cloud improvements
+All four trials keep serving orders until time expires. Each correct order scores 100 base points. Three consecutive correct orders activate ×2 and six activate ×3. A wrong submission loses that order and resets the streak. After the error animation, play advances to the next order with a fresh workspace. Players keep their earned points and see the number of lost orders at the end of the round. In the configuration trial the game checks the arrangement when its electron count matches the order; intermediate edits below that count are free. A correct answer shows a checkmark and floating points. An incorrect answer shakes the order and shows a cross. The flame appears during a streak and changes from orange to gold to blue with the multiplier. Reduced-motion settings keep the marks and point values visible. Players can mute sound or pause the flame.
 
-- Real radial part (hydrogen-atom wavefunctions) so you can see **radial nodes** (2s has an empty inner sphere, 3s has two).
-- Real spherical harmonics, including the "donut" of the dz² orbital.
-- **Positive and negative phase** in two colors (key for explaining bonding as overlap of same-phase lobes).
-- Two styles: point cloud (probability density) and translucent surface (the classic textbook image).
-- Size depends on effective nuclear charge, so orbitals contract as atomic number increases.
-- Scientific note: for multi-electron atoms there is no exact solution; hydrogen-like orbitals with effective charge are used. This is the standard teaching approximation.
+| Stars in one round | Minimum score |
+|---|---:|
+| ★ | 800 |
+| ★★ | 1700 |
+| ★★★ | 3200 |
+
+Crossing a threshold immediately banks the highest star count for that trial. The first star unlocks the next trial, including the separate configuration level after Iones. Its first star unlocks Molecules. Players can earn all three stars in one round and continue scoring until the timer ends. Each replay starts at zero points and retains the best star count. The unified save keeps the higher of the former Easy and Hard counts for each trial.
+
+Players choose an inclusive maximum atomic number on the campaign map or during a round: 2 (He), 10 (Ne), 18 (Ar), 36 (Kr), 54 (Xe), 86 (Rn) or 118 (Og). The initial maximum is 10. The choice is saved across trials and is independent of stars. Changing the limit keeps the clock, score and streak. Eligible orders keep their targets and any work in progress. Pending orders outside the new range are replaced without a penalty. All four trials draw from shuffled decks filtered by the selected maximum. Neutral and configuration orders use the periodic catalog, isotope orders use observed masses, and ion orders use cataloged charges.
+
+## Laboratory orbital representations
+
+- **Probability cloud**. Three.js draws samples from the squared hydrogenic wavefunction for occupied s, p, d, and f orbitals. Approximate screening adjusts each orbital's radial scale. Point density represents probability. A student can inspect one occupied orbital or view the selected sublevels together.
+- **Orbital shape**. A shaded surface visualizes a real spherical harmonic. Extensions estimated from the radial distributions set the relative sizes of layered surfaces. It illustrates angular shape. Use the cloud to examine radial nodes. The s, p, d, and f colors are shared across the diagram and renderer. Each orbital uses a single hue across all its lobes. Its principal level and orientation vary its family hue.
+
+The laboratory opens the occupied orbitals of the selected element as layers. A proton slider changes elements alongside the periodic table. The orbital diagrams show representative spin occupancy, grouped by shell and subshell. A Möller diagram places subshells by principal level and orbital type. The rank numbers show the approximate diagonal filling order, while the counts follow the selected atom’s reference configuration. Each subshell in the diagram contains its spin boxes directly. Students can independently show or hide occupied orbitals. Empty slots stay blank and are excluded from the 3D scene. Students can rotate and zoom, align the camera to either end of X, Y, or Z and reset the view using the viewport gizmo, and switch between representations using controls over the viewport. The nucleus is scaled relative to 1s so the inner orbital remains visible when zooming. Cloud points and electron markers scale with their orbital radius. Perspective changes their apparent size with distance from the camera. Both representations share the same scale and sampled positions. Playback starts paused. Play, pause, and previous and next frame buttons control the sequence, and a speed selector sets the sampling cadence to 1×, 2×, or 3×, with 2× selected initially. Returning to a frame restores its sampled positions for each visible electron. When changing elements, the camera eases back to its framing distance. Reduced-motion preferences suppress automatic camera motion. Neutron counts refer to a representative isotope. Configurations from meitnerium onward are marked as estimates.
+
+Ground-state configuration reference: [NIST Periodic Table of the Elements](https://www.nist.gov/pml/periodic-table-elements).
