@@ -103,7 +103,7 @@ export class AtomSession {
 	get manual() { return this.round.manual; }
 	get unlocked() { return this.#stars[rounds.findIndex(round => round.kernel)] > 0; }
 	get snapshot() {
-		return { version: 6, stars: [...this.#stars], limit: this.limit, showProtons: this.showProtons, showMass: this.showMass };
+		return { version: 7, stars: [...this.#stars], limit: this.limit, showProtons: this.showProtons, showMass: this.showMass };
 	}
 	readonly pathLength = particleTrials;
 	readonly maxStars = starScores.length;
@@ -115,7 +115,7 @@ export class AtomSession {
 			const nextStar = Math.min(stars + 1, this.maxStars);
 			return {
 				title: round.title, stars, nextStar,
-				locked: index > 0 && earned[index - 1] === 0
+				locked: index > 0 && stars === 0 && earned[index - 1] === 0
 			};
 		});
 	}
@@ -138,6 +138,10 @@ export class AtomSession {
 			this.#stars = this.#savedStars(legacySnapshot).map((stars, i) => Math.max(stars, Number(i < completed)));
 		} else {
 			this.#stars = this.#savedStars(snapshot);
+		}
+		if (!('version' in snapshot) || snapshot.version !== 7) {
+			// Older saves placed electron configuration immediately after ions.
+			this.#stars = [...this.#stars.slice(0, 3), 0, ...this.#stars.slice(3, rounds.length - 1)];
 		}
 		this.#resetRun();
 	}

@@ -7,7 +7,7 @@
 
 	let { children }: LayoutProps = $props();
 	const session = setContext(AtomSession, new AtomSession());
-	const storageKey = 'luddens.atom.orders.v6';
+	const storageKey = 'luddens.atom.orders.v7';
 	const playingRoute = $derived(page.route.id === '/atom/pruebas/[nivel]');
 	const navLink = 'grid min-h-14 content-center justify-items-center gap-0.5 rounded-xl px-3 text-xs font-semibold text-muted hover:bg-control aria-[current=page]:bg-selected aria-[current=page]:text-mint';
 	let ready = $state(false);
@@ -18,7 +18,7 @@
 	}
 
 	onMount(() => {
-		const current = readSave(storageKey) ?? readSave('luddens.atom.orders.v5');
+		const current = readSave(storageKey) ?? readSave('luddens.atom.orders.v6') ?? readSave('luddens.atom.orders.v5');
 		if (current) session.restore(current);
 		else {
 			const older = readSave('luddens.atom.orders.v3') ?? readSave('luddens.atom.orders.v2');

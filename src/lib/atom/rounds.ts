@@ -32,7 +32,7 @@ const heavierIons = heavierElements.flatMap(element => {
 
 const notation = 'El número de abajo a la izquierda (Z) indica los protones. El de arriba a la izquierda (A) suma protones y neutrones. En un átomo neutro hay tantos electrones como protones.';
 
-export const rounds: readonly Round[] = [
+const particleRounds: readonly Round[] = [
 	{
 		title: 'Átomos neutros',
 		lesson: notation + ' Por ejemplo, para preparar carbono con masa 12, añade 6 protones, 6 neutrones y 6 electrones.',
@@ -61,6 +61,21 @@ export const rounds: readonly Round[] = [
 			recipe(19, 20, 18), recipe(20, 20, 18), recipe(24, 28, 21), recipe(26, 30, 24),
 			recipe(29, 34, 28), recipe(30, 34, 28), recipe(35, 44, 36), recipe(36, 48, 35), ...heavierIons
 		]
+	}
+];
+
+const ionizedIsotopes = particleRounds[2].recipes.flatMap(ion => {
+	const mass = alternateIsotopeMass(periodicCatalog[ion.protons - 1]);
+	return mass === undefined ? [] : [recipe(ion.protons, mass - ion.protons, ion.electrons)];
+});
+
+export const rounds: readonly Round[] = [
+	...particleRounds,
+	{
+		title: 'Átomos, isótopos e iones',
+		lesson: 'Combina el número atómico, la masa y la carga para calcular las tres partículas. Por ejemplo, el oxígeno-18 con carga 1− tiene 8 protones, 10 neutrones y 9 electrones.',
+		seconds: 180, manual: false,
+		recipes: [...particleRounds.flatMap(round => round.recipes), ...ionizedIsotopes]
 	},
 	{
 		title: 'Configuración electrónica',
