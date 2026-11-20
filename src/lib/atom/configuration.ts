@@ -11,7 +11,7 @@ export class Configuration {
 	) {}
 
 	get prompt() {
-		if (this.core === undefined) return 'Gas noble anterior';
+		if (this.core === undefined) return 'Gas noble';
 		if (!this.level) return 'Nivel';
 		return this.letter ? 'Superíndice (electrones)' : 'Subnivel';
 	}
@@ -33,7 +33,7 @@ export class Configuration {
 		return new Configuration(this.core, [...this.terms, { name: this.level + this.letter, count: Number(value) }]);
 	}
 
-	get complete() { return this.terms.length > 0 && !this.level; }
+	get complete() { return (Boolean(this.core) || this.terms.length > 0) && !this.level; }
 
 	matches(target: Atom) {
 		return this.complete && subshells.every(({ name, orbitals }) => {

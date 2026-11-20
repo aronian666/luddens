@@ -17,6 +17,7 @@ function recipe(protons: number, neutrons: number, electrons = protons): Atom {
 }
 
 export const nobleGases = periodicCatalog.filter(element => element.group === 18);
+export const kernelCores = nobleGases.filter(gas => gas.protons > 2);
 export const starScores = [800, 1700, 3200] as const;
 
 const heavierElements = periodicCatalog.filter(element => element.protons > 36);
@@ -63,15 +64,15 @@ export const rounds: readonly Round[] = [
 	},
 	{
 		title: 'Configuración electrónica',
-		lesson: 'Elige el gas noble anterior. Para hidrógeno y helio, elige «Sin gas noble anterior». Añade cada término eligiendo nivel, subnivel y superíndice. Envía la configuración cuando termines.',
+		lesson: 'Completa el diagrama desde 1s. Marca primero un espín ↑ por orbital del subnivel y luego empareja los electrones con ↓.',
 		seconds: 180, manual: true,
 		recipes: neutralCatalog
 	},
 	{
 		title: 'Configuración abreviada (kernel)',
-		lesson: 'El símbolo de un gas noble entre corchetes representa sus electrones internos. Elige el gas noble anterior y completa los orbitales restantes.',
+		lesson: 'Antes del neón, escribe la configuración completa desde 1s. Si el pedido es neón u otro gas noble más pesado, elige su propia ficha y envíala. Para los demás elementos, elige el gas noble anterior y completa los subniveles restantes.',
 		seconds: 180, manual: true, kernel: true,
-		recipes: neutralCatalog.filter(atom => atom.protons > 2)
+		recipes: neutralCatalog
 	},
 	{
 		title: 'Números cuánticos',

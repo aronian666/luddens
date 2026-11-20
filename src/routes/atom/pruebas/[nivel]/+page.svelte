@@ -8,6 +8,7 @@
 	import { elementCategoryLabels } from '#lib/atom/elements.js';
 	import { OrderSounds } from '#lib/atom/order-sounds.js';
 	import RoundScore from '#lib/atom/RoundScore.svelte';
+	import OrbitalDiagram from '#lib/atom/OrbitalDiagram.svelte';
 	import ParticleTray from '#lib/atom/ParticleTray.svelte';
 
 	const session = getContext<AtomSession>(AtomSession);
@@ -144,7 +145,7 @@
 						{#key position === 0 ? session.submission : undefined}
 							<div class={['grid justify-items-center gap-1', position === 0 && session.submission?.kind === 'incorrect' && 'motion-safe:animate-order-shake']}>
 								<span class="text-[.65rem] font-semibold text-muted">Pedido {order.number}</span>
-								<Nuclide atom={order.target} showAtomicNumber />
+								<Nuclide atom={order.target} showAtomicNumber={session.showProtons} showMass={session.showMass} />
 								<strong class="max-w-full text-xs leading-tight sm:text-sm">{order.target.name}</strong>
 								{#if category}<small class="text-xs leading-tight text-(--element-color)">{elementCategoryLabels[category]}</small>{/if}
 							</div>
@@ -177,7 +178,9 @@
 						<p class="text-sm text-muted">Ordena los orbitales de −ℓ a +ℓ. Llena primero con +½ y luego con −½. Puedes escribir el espín como fracción o decimal.</p>
 						<button type="submit" class="atom-control w-fit bg-mint text-page" disabled={!session.canEdit}>Enviar</button>
 					</form>
-				{:else if session.manual}
+				{:else if session.usesDiagram}
+					<OrbitalDiagram {session} onSubmission={playCue} />
+				{:else if session.round.kernel}
 					{@const draft = session.configuration}
 					<div role="region" aria-label="Zona para soltar fichas"
 						class={['flex min-h-20 flex-wrap items-baseline gap-2 rounded-xl border-2 border-dashed p-4 font-mono text-xl', dragged ? 'border-mint bg-mint/10' : 'border-line']}

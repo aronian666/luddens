@@ -122,8 +122,12 @@ export class AtomExplorer {
 		if (this.electronSpeedOptions.some(option => option.value === value)) this.#electronSpeed = value;
 	}
 
+	#diagramMode = $state<'Möller' | 'Iguano'>('Möller');
+	get diagramMode() { return this.#diagramMode; }
+	set diagramMode(value: 'Möller' | 'Iguano') { this.#diagramMode = value; }
+
 	get diagram() {
-		return Array.from({ length: 7 }, (_, index) => {
+		const rows = Array.from({ length: 7 }, (_, index) => {
 			const n = index + 1;
 			return {
 				n,
@@ -145,6 +149,18 @@ export class AtomExplorer {
 				})
 			};
 		});
+		if (this.diagramMode === 'Möller') return rows;
+		// Each Iguano row reads one filling diagonal from left to right.
+		const diagonals = new Map<number, (typeof rows)[number]>();
+		for (const row of rows) {
+			for (const cell of row.cells) {
+				if (!cell) continue;
+				const diagonal = cell.n + cell.l;
+				if (!diagonals.has(diagonal)) diagonals.set(diagonal, { n: diagonal, cells: [] });
+				diagonals.get(diagonal)!.cells.push(cell);
+			}
+		}
+		return [...diagonals.values()].sort((a, b) => a.n - b.n);
 	}
 
 	get visibleOrbitals(): readonly Orbital[] {

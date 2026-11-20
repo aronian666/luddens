@@ -1,10 +1,12 @@
 <script lang="ts">
+	import DiagramSelector from '#lib/atom/DiagramSelector.svelte';
 	import PeriodicTable from '#lib/atom/PeriodicTable.svelte';
 	import AtomScene from '#lib/atom/AtomScene.svelte';
 	import { elementCategoryLabels } from '#lib/atom/elements.js';
 	import { AtomExplorer } from '#lib/atom/explorer.svelte.js';
 
 	const explorer = new AtomExplorer();
+	const iguano = $derived(explorer.diagramMode === 'Iguano');
 </script>
 
 <svelte:head>
@@ -134,10 +136,12 @@
 					</label>
 					<p class="text-sm text-muted">{explorer.cloudParticleTotalLabel} partículas en la nube.</p>
 				{/if}
+				<DiagramSelector bind:modeSelected={explorer.diagramMode} />
 				<!-- svelte-ignore a11y_no_noninteractive_tabindex (The labeled overflow region supports keyboard scrolling.) -->
 				<div class="overflow-auto p-1" role="region" tabindex="0" aria-label="Subniveles y espines">
-					<table class="w-full min-w-[25.5rem] table-fixed border-separate border-spacing-[.18rem] [&_th]:font-mono [&_th]:text-xs [&_th]:font-normal [&_th]:text-muted [&_td]:align-top" aria-label="Diagrama de Möller">
-						<caption class="py-1 text-left text-sm text-muted">Diagrama de Möller</caption>
+					<table class="w-full min-w-[25.5rem] table-fixed border-separate border-spacing-[.18rem] [&_th]:font-mono [&_th]:text-xs [&_th]:font-normal [&_th]:text-muted [&_td]:align-top">
+						<caption class="py-1 text-left text-sm text-muted">Diagrama {iguano ? 'Iguano' : 'de Möller'}</caption>
+						{#if !iguano}
 						<colgroup>
 							<col class="w-[1.15rem]" />
 							{#each explorer.orbitalTypes as type}<col class={{ s: 'w-[12%]', p: 'w-[24%]', d: 'w-[27%]', f: '' }[type]} />{/each}
@@ -148,21 +152,24 @@
 								{#each explorer.orbitalTypes as type}<th scope="col">{type}</th>{/each}
 							</tr>
 						</thead>
+						{:else}
+							<colgroup><col span="4" /></colgroup>
+						{/if}
 						<tbody>
 							{#each explorer.diagram as row (row.n)}
 								<tr>
-									<th scope="row">{row.n}</th>
+									{#if !iguano}<th scope="row">{row.n}</th>{/if}
 									{#each row.cells as cell}
 										<td>
 											{#if cell}
 												<div class={[
 													'relative grid gap-0.5 rounded-lg border border-line p-[.19rem] [--orbital-color:hsl(var(--orbital-hue)_74%_72%)]',
 													cell.electrons ? 'bg-[color-mix(in_oklab,var(--color-panel)_90%,var(--orbital-color))] text-(--orbital-color)' : 'border-dashed bg-[#0e181e] text-muted',
-													cell.nextDiagonal && "after:pointer-events-none after:absolute after:-bottom-2 after:-left-1.5 after:z-1 after:text-xs after:text-muted after:content-['↙']"
+													!iguano && cell.nextDiagonal && "after:pointer-events-none after:absolute after:-bottom-2 after:-left-1.5 after:z-1 after:text-xs after:text-muted after:content-['↙']"
 												]}
 													style:--orbital-hue={cell.hue}>
 													<div class="flex items-baseline justify-between gap-0.5 font-mono text-xs [&>small]:text-[.66rem] [&>small]:text-muted">
-														<strong>{cell.name}</strong>
+														<strong>{cell.name}{#if iguano}<sup>{2 * cell.slots.length}</sup>{/if}</strong>
 														<small title={'Paso ' + cell.rank + ' del orden de llenado'}>{cell.rank}</small>
 													</div>
 													<div class="flex flex-wrap gap-[.13rem]" role="group" aria-label={'Orbitales ' + cell.name}>
@@ -191,7 +198,7 @@
 						</tbody>
 					</table>
 				</div>
-				<p class="text-xs text-muted">↙ Orden de llenado orientativo. El deslizador muestra la ocupación de cada elemento.</p>
+				<p class="text-xs text-muted">{iguano ? 'Lee cada fila de izquierda a derecha. El superíndice indica la capacidad del subnivel y las flechas muestran sus electrones.' : '↙ Orden de llenado orientativo. El deslizador muestra la ocupación de cada elemento.'}</p>
 				<p class="text-xs text-muted">↑ Un electrón. ↑↓ Dos electrones con espines opuestos.</p>
 			</div>
 		</div>

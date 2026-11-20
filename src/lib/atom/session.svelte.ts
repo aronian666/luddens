@@ -1,6 +1,7 @@
 import { Atom, neutralCatalog, type Particle } from './atom.js';
-import { nobleGases, rounds, starScores, type Order } from './rounds.js';
+import { kernelCores, nobleGases, rounds, starScores, type Order } from './rounds.js';
 
+import { OrbitalBoard } from './orbital-board.svelte.js';
 import { Configuration } from './configuration.js';
 
 type QuantumAnswer = Record<'n' | 'l' | 'ml' | 'ms', string>;
@@ -28,16 +29,24 @@ export class AtomSession {
 	#stars = $state.raw<readonly number[]>(emptyStars());
 	#submission = $state.raw<OrderSubmission>();
 	#limit = $state(10);
+	#showProtons = $state(true);
+	#showMass = $state(true);
 	#state = $state<RoundState>('ready');
 	#orders = $state.raw<readonly Order[]>([]);
 	#deck: Atom[] = [];
 	#lastDraw?: Atom;
 	#atom = $state.raw(emptyAtom);
 	#particleCounts = $state<ParticleCounts>({ ...initialCounts });
+	#orbitalBoard = $state.raw(new OrbitalBoard());
+	#diagramMode = $state<'Möller' | 'Iguano'>('Möller');
+	get diagramMode() { return this.#diagramMode; }
+	set diagramMode(value: 'Möller' | 'Iguano') { this.#diagramMode = value; }
+	get orbitalBoard() { return this.#orbitalBoard; }
+	get usesDiagram() { return this.manual && !this.round.kernel; }
 	#configuration = $state.raw(new Configuration());
 	#history = $state.raw<readonly Configuration[]>([]);
 	get configuration() { return this.#configuration; }
-	get coreOptions() { return nobleGases.filter(gas => gas.protons < this.limit); }
+	get coreOptions() { return kernelCores.filter(gas => gas.protons <= this.limit); }
 	#feedback = $state('');
 	#seconds = $state(rounds[0].seconds);
 	#delivered = $state(0);
@@ -65,9 +74,14 @@ export class AtomSession {
 	readonly starScores = starScores;
 	get totalStars() { return this.#stars.reduce((sum, stars) => sum + stars, 0); }
 	get roundStars() { return starScores.filter(threshold => this.#score >= threshold).length; }
+	get showProtons() { return this.#showProtons; }
+	get showMass() { return this.#showMass; }
+	set showProtons(value: boolean) { this.#showProtons = value; }
+	set showMass(value: boolean) { this.#showMass = value; }
+	readonly limitOptions = nobleGases;
 	get limit() { return this.#limit; }
 	set limit(value: number) {
-		if ((this.running && this.round.kernel && value <= 2) || value === this.#limit || !nobleGases.some(gas => gas.protons === value)) return;
+		if (value === this.#limit || !this.limitOptions.some(gas => gas.protons === value)) return;
 		this.#limit = value;
 		this.#deck = [];
 		if (!this.running) return;
@@ -85,11 +99,11 @@ export class AtomSession {
 	get feedback() { return this.#feedback; }
 	get canEdit() { return this.running && this.#nextOrderAt === 0; }
 	get usesParticleForm() { return !this.manual && !this.round.quantum; }
-	get canUndo() { return !this.usesParticleForm && this.canEdit && this.#history.length > 0; }
+	get canUndo() { return this.canEdit && (this.usesDiagram ? this.orbitalBoard.canUndo : this.#history.length > 0); }
 	get manual() { return this.round.manual; }
 	get unlocked() { return this.#stars[rounds.findIndex(round => round.kernel)] > 0; }
 	get snapshot() {
-		return { version: 6, stars: [...this.#stars], limit: this.limit };
+		return { version: 6, stars: [...this.#stars], limit: this.limit, showProtons: this.showProtons, showMass: this.showMass };
 	}
 	readonly pathLength = particleTrials;
 	readonly maxStars = starScores.length;
@@ -108,6 +122,8 @@ export class AtomSession {
 
 	restore(snapshot: unknown, legacySnapshot?: unknown) {
 		if (!snapshot || typeof snapshot !== 'object') return;
+		this.showProtons = 'showProtons' in snapshot && typeof snapshot.showProtons === 'boolean' ? snapshot.showProtons : true;
+		this.showMass = 'showMass' in snapshot && typeof snapshot.showMass === 'boolean' ? snapshot.showMass : true;
 		if ('limit' in snapshot && typeof snapshot.limit === 'number') this.limit = snapshot.limit;
 		if ('version' in snapshot && snapshot.version === 5 && 'stars' in snapshot &&
 			snapshot.stars && typeof snapshot.stars === 'object') {
@@ -162,7 +178,6 @@ export class AtomSession {
 		this.#resetRun();
 		this.#deck = [];
 		this.#lastDraw = undefined;
-		if (this.round.kernel && this.limit <= 2) this.limit = 10;
 		this.#orders = [this.#order(1)];
 		this.#prepareOrder();
 		this.#deadline = now + this.round.seconds * 1000;
@@ -196,7 +211,8 @@ export class AtomSession {
 		const { target } = this.#orders[0];
 		this.#feedback = '';
 		this.#atom = this.manual ? new Atom(target.protons, target.neutrons, 0) : emptyAtom;
-		this.#configuration = new Configuration();
+		this.#configuration = new Configuration(this.round.kernel && target.protons < kernelCores[0].protons ? null : undefined);
+		this.#orbitalBoard = new OrbitalBoard();
 		this.#particleCounts = { ...initialCounts };
 		this.#quantum = { n: '', l: '', ml: '', ms: '' };
 		this.#history = [];
@@ -246,16 +262,21 @@ export class AtomSession {
 	}
 
 	submitConfiguration() {
-		if (this.manual && this.configuration.complete && this.#canEdit()) return this.#checkOrder();
+		if (this.usesDiagram && this.#canEdit()) return this.orbitalBoard.matches(this.orders[0].target) ? this.#correctOrder() : this.#incorrectOrder();
+		if (this.round.kernel && this.configuration.complete && this.#canEdit()) return this.#checkOrder();
+	}
+
+	toggleSpin(slot: number, spin: 1 | 2) {
+		if (this.usesDiagram && this.#canEdit()) this.orbitalBoard.toggle(slot, spin);
 	}
 
 	choosePart(value: string) {
-		if (this.manual && this.#canEdit()) this.#edit(this.configuration.choose(value));
+		if (this.round.kernel && this.#canEdit()) this.#edit(this.configuration.choose(value));
 	}
 
 	selectCore(protons: number) {
-		if (!this.manual || !this.#canEdit() || this.configuration.core !== undefined) return;
-		if (protons && !this.coreOptions.some(gas => gas.protons === protons)) return;
+		if (!this.round.kernel || !this.#canEdit() || this.configuration.core !== undefined) return;
+		if (!this.coreOptions.some(gas => gas.protons === protons)) return;
 		this.#edit(new Configuration(neutralCatalog.find(atom => atom.protons === protons) ?? null));
 	}
 
@@ -268,8 +289,11 @@ export class AtomSession {
 
 	undo() {
 		if (!this.#canEdit() || !this.canUndo) return;
-		this.#configuration = this.#history.at(-1)!;
-		this.#history = this.#history.slice(0, -1);
+		if (this.usesDiagram) this.orbitalBoard.undo();
+		else {
+			this.#configuration = this.#history.at(-1)!;
+			this.#history = this.#history.slice(0, -1);
+		}
 		this.#feedback = 'Movimiento deshecho.';
 	}
 
@@ -309,7 +333,7 @@ export class AtomSession {
 		const atom = this.#atom;
 		const { target } = this.#orders[0];
 		const correct = this.manual
-			? this.configuration.matches(target) && this.configuration.core?.protons === nobleGases.findLast(gas => gas.protons < target.protons)?.protons
+			? this.configuration.matches(target) && this.configuration.core?.protons === kernelCores.findLast(gas => gas.protons <= target.protons)?.protons
 			: atom.protons === target.protons && atom.neutrons === target.neutrons && atom.electrons === target.electrons;
 		if (!correct) {
 			return this.#incorrectOrder();
